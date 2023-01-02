@@ -26,13 +26,13 @@ body {
   background: black;
 }
 
-.cell.snake {
-  background-color: green;
+.cell.apple {
+  background-color: red;
   border: 1px solid transparent;
 }
 
-.cell.apple {
-  background-color: red;
+.cell.snake {
+  background-color: green;
   border: 1px solid transparent;
 }
 

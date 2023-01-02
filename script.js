@@ -1,13 +1,19 @@
 const field = document.querySelector(".field");
+const textScore = document.querySelector(".score");
 
 const snake = [
   { y: 5, x: 5 },
   { y: 5, x: 4 },
 ];
 
-let apple = { y: Math.random() * 10, x: Math.random() * 10 };
+let lastSnakePoint = null;
 
-let check = true;
+let score = 0;
+
+let apple = {
+  y: Math.floor(Math.random() * (11 - 1) + 1),
+  x: Math.floor(Math.random() * (11 - 1) + 1),
+};
 
 let move = "ArrowRight";
 
@@ -32,8 +38,6 @@ for (let i = 1; i <= 10; i++) {
 }
 
 function game() {
-  check = true;
-
   document
     .querySelector(`[data-y="${apple.y}"][data-x="${apple.x}"]`)
     .classList.add("apple");
@@ -41,20 +45,37 @@ function game() {
   const cells = document.querySelectorAll(".cell");
 
   cells.forEach(cell => {
-    cell.classList.remove("snake");
+    if (cell.classList.contains("apple") && cell.classList.contains("snake")) {
+      cell.classList.remove("apple");
 
-    // if (cell.classList.includes("apple") && cell.classList.includes("snake")) {
-    //   apple = { y: Math.random() * 10, x: Math.random() * 10 };
-    //   document
-    //     .querySelector(`[data-y="${apple.y}"][data-x="${apple.x}"]`)
-    //     .classList.add("apple");
-    // }
+      snake.push(lastSnakePoint);
+
+      score++;
+      textScore.textContent = score;
+      apple = {
+        y: Math.floor(Math.random() * (11 - 1) + 1),
+        x: Math.floor(Math.random() * (11 - 1) + 1),
+      };
+
+      document
+        .querySelector(`[data-y="${apple.y}"][data-x="${apple.x}"]`)
+        .classList.add("apple");
+    }
+
+    cell.classList.remove("snake");
   });
 
   for (let coord of snake) {
-    document
-      .querySelector(`[data-y="${coord.y}"][data-x="${coord.x}"]`)
-      .classList.add("snake");
+    const snakeCoord = document.querySelector(
+      `[data-y="${coord.y}"][data-x="${coord.x}"]`
+    );
+
+    if (snakeCoord.classList.contains("snake")) {
+      clearInterval(startGame);
+      textScore.textContent = "Вы проиграли!";
+    }
+
+    snakeCoord.classList.add("snake");
   }
 
   switch (move) {
@@ -86,21 +107,17 @@ function game() {
       break;
   }
 
-  snake.pop();
+  lastSnakePoint = snake.pop();
 }
 
 document.addEventListener("keydown", e => {
-  if (!check) return;
-  else if (move === "ArrowUp" && e.key === "ArrowDown") return;
+  if (move === "ArrowUp" && e.key === "ArrowDown") return;
   else if (move === "ArrowRight" && e.key === "ArrowLeft") return;
   else if (move === "ArrowDown" && e.key === "ArrowUp") return;
   else if (move === "ArrowLeft" && e.key === "ArrowRight") return;
-  else {
-    check = false;
-    move = e.key;
-  }
+  else move = e.key;
 });
 
 game();
 
-setInterval(game, 500);
+const startGame = setInterval(game, 500);
